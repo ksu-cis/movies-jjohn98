@@ -9,26 +9,50 @@ namespace Movies.Pages
 {
     public class IndexModel : PageModel
     {
-        MovieDatabase movieDatabase = new MovieDatabase();
+        public MovieDatabase movieDatabase = new MovieDatabase();
 
         public List<Movie> Movies;
 
+        [BindProperty]
+        public string search { get; set; }
+
+        [BindProperty]
+        public List<string> rating { get; set; } = new List<string>();
+
+        [BindProperty]
+        public float? minIMDB { get; set; }
+
+        [BindProperty]
+        public float? maxIMDB { get; set; }
+
         public void OnGet()
         {
-            Movies = movieDatabase.All;
+            Movies = MovieDatabase.All;
         }
 
-        public void OnPost(string search, List<string> rating)
+        public void OnPost()
         {
-            if (search != null && rating.Count != 0)
-                Movies = movieDatabase.SearchandFilter(search, rating);
-            else if (rating.Count != 0)
-                Movies = movieDatabase.Filter(rating);
-            else if (search != null)
-                Movies = movieDatabase.Search(search);
-            else
-                Movies = movieDatabase.All;
+            Movies = MovieDatabase.All;
 
+            if (search != null)
+            {
+                Movies = MovieDatabase.Search(Movies, search);
+            }
+
+            if (rating.Count != 0)
+            {
+                Movies = MovieDatabase.FilterByMPAA(Movies, rating);
+            }
+
+            if (minIMDB != null)
+            {
+                Movies = MovieDatabase.FilterByMinIMDB(Movies, (float)minIMDB);
+            }
+
+            if (maxIMDB != null)
+            {
+                Movies = MovieDatabase.FilterByMinIMDB(Movies, (float)maxIMDB);
+            }
         }
     }
 }
